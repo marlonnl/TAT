@@ -30,7 +30,7 @@ st.title("Análise TAT")
 uploaded_file = st.file_uploader("Escolha o arquivo .CSV", type=["csv", "xlsx"])
 
 if uploaded_file is not None:
-  data = pd.read_csv('data.csv', header=2, usecols=[5, 6, 7, 13, 17], dtype={5: manchester_dtype, 6: protocolo_dtype})
+  data = pd.read_csv(uploaded_file, header=2, usecols=[5, 6, 7, 13, 17], dtype={5: manchester_dtype, 6: protocolo_dtype})
 
   # st.write("Dados")
   # st.dataframe(data)
