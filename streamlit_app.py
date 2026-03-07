@@ -258,7 +258,7 @@ if uploaded_file is not None:
         encoding='latin1',
         sep=';'
     )
-    print(data)
+    st.dataframe(data)
     
     # Filtragens
     ## Protocolos
