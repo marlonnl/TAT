@@ -258,7 +258,8 @@ if uploaded_file is not None:
         encoding='latin1',
         sep=';'
     )
-
+    print(data)
+    
     # Filtragens
     ## Protocolos
     sepse_df      = data[(data['Protocolo'].str.lower() == 'sepse')        & (data['Exame'] == 'LACTATO')]
