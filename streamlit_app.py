@@ -254,7 +254,7 @@ if uploaded_file is not None:
     data = pd.read_csv(
         uploaded_file, header=2, usecols=[1, 3, 4, 5, 6, 7, 13, 17, 18],
         dtype={5: manchester_dtype, 6: protocolo_dtype},
-        encoding='utf-8-sig'
+        encoding='latin1'
     )
 
     # Filtragens
