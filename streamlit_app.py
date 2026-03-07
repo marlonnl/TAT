@@ -259,6 +259,7 @@ if uploaded_file is not None:
         encoding='latin1',
         sep=';'
     )
+    data = data.rename(columns={' TA Coleta ': 'TA Coleta', ' TA Triagem ': 'TA Triagem', ' TAT LAB ': 'TAT LAB', ' TAT ': 'TAT'})
     #st.dataframe(data)
     
     # Filtragens
