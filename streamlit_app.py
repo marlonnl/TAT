@@ -258,7 +258,7 @@ if uploaded_file is not None:
         encoding='latin1',
         sep=';'
     )
-    st.dataframe(data)
+    #st.dataframe(data)
     
     # Filtragens
     ## Protocolos
@@ -272,9 +272,9 @@ if uploaded_file is not None:
     purgente_df   = data[data['Manchester'].str.lower() == 'pouco urgente']
 
     # Data
-    mes = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).month
-    ano = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).year
-    st.markdown(f':grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]', width="stretch")
+    #mes = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).month
+    #ano = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).year
+    #st.markdown(f':grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]', width="stretch")
 
     # Tabs
     sepse_tab, card_tab, avc_tab, emergencia_tab, murgente_tab, urgente_tab, purgente_tab = st.tabs(
