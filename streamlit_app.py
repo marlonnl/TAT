@@ -274,15 +274,9 @@ if uploaded_file is not None:
     purgente_df   = data[data['Manchester'].str.lower() == 'pouco urgente']
 
     # Data
-<<<<<<< HEAD
     mes = pd.to_datetime(data['Data'].iloc[1], dayfirst=True).month
     ano = pd.to_datetime(data['Data'].iloc[1], dayfirst=True).year
     st.markdown(f':grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]', width="stretch")
-=======
-    #mes = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).month
-    #ano = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).year
-    #st.markdown(f':grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]', width="stretch")
->>>>>>> a2290b5401fd71161271989be32982d58ba65209
 
     # Tabs
     sepse_tab, card_tab, avc_tab, emergencia_tab, murgente_tab, urgente_tab, purgente_tab = st.tabs(
