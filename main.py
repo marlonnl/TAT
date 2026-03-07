@@ -73,7 +73,10 @@ def mostrar_protocolo_tab(tab, df, session_key, protocolo, exame, meta):
         # Calcula métricas
         df_meta = edited_df[pd.to_timedelta(edited_df['TAT LAB']) < meta]
         # print(f'{protocolo}: dentro da meta {len(df_meta)} e total {len(edited_df)}')
-        rel_pct = round(len(df_meta) * 100 / len(edited_df), 2)
+        if len(df_meta) > 0:
+          rel_pct = round(len(df_meta) * 100 / len(edited_df), 2)
+        else:
+           rel_pct = 0
 
         def calc_metric(col):
             t = pd.to_timedelta(edited_df[col]).mean()

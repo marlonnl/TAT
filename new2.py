@@ -47,8 +47,12 @@ COR = {
     'pouco urgente': 'blue',
 }
 
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
 def _grupos_protocolo(protocolo: str, exame: str) -> list[dict]:
-    """Monta a lista de grupos para os protocolos (Sepse, AVC, DT)."""
+    """Monta a lista de grupos para os protocolos simples (Sepse, AVC, DT)."""
     meta = pd.Timedelta(minutes=METAS[protocolo.lower()][0])
     return [{"exames": [exame], "meta": meta, "label": None}]
 
@@ -65,8 +69,12 @@ def _grupos_manchester(protocolo: str) -> list[dict]:
     ]
 
 
+# ---------------------------------------------------------------------------
+# Tabela de referência usada nos Manchester
+# ---------------------------------------------------------------------------
+
 def _criar_tabela_referencia(protocolo: str) -> None:
-    """Renderiza a tabela de exames vs metas para classificações Manchester."""
+    """Renderiza a tabela de exames × metas para classificações Manchester."""
     protocolo_ = protocolo.lower()
     st.markdown(f'##### :{COR[protocolo_]}[:material/radio_button_checked:] *{protocolo}*')
 
@@ -80,6 +88,10 @@ def _criar_tabela_referencia(protocolo: str) -> None:
     })
     st.table(classificacao, border="horizontal")
 
+
+# ---------------------------------------------------------------------------
+# Bloco de métricas reutilizável
+# ---------------------------------------------------------------------------
 
 def _bloco_metricas(edited_df: pd.DataFrame, meta: pd.Timedelta) -> None:
     """Renderiza os cards de métricas para um grupo de exames."""
@@ -96,11 +108,9 @@ def _bloco_metricas(edited_df: pd.DataFrame, meta: pd.Timedelta) -> None:
         t = edited_df[col].mean()
         if pd.isna(t):
             return "00:00:00", "00:00:00", ["down", "green"]
-        
         t_f   = str(t.round('1s')).split()[-1]
         t_dif = str(abs(t - meta).round('1s')).split()[-1]
         t_arrow = ["up", "red"] if (t - meta) > pd.Timedelta(0) else ["down", "green"]
-        
         return t_f, t_dif, t_arrow
 
     tmc_f, tmc_dif, tmc_arrow = calc_metric('TA Coleta')
@@ -119,6 +129,10 @@ def _bloco_metricas(edited_df: pd.DataFrame, meta: pd.Timedelta) -> None:
     d.metric(label='Tempo médio de liberação',  value=tml_f, delta=tml_dif, delta_arrow=tml_arrow[0], delta_color=tml_arrow[1], border=True)
     e.metric(label='TAT',                       value=tat_f, delta=tat_dif, delta_arrow=tat_arrow[0], delta_color=tat_arrow[1], border=True)
 
+
+# ---------------------------------------------------------------------------
+# Função principal unificada
+# ---------------------------------------------------------------------------
 
 def mostrar_protocolo_tab(
     tab,
@@ -247,55 +261,39 @@ def mostrar_protocolo_tab(
 
 st.title("Análise TAT")
 
-#st.write(' oi')
 uploaded_file = st.file_uploader("Escolha o arquivo .CSV", type=["csv"], max_upload_size=400)
 
 if uploaded_file is not None:
     data = pd.read_csv(
-        uploaded_file, header=2,
-        usecols=['Data','Requisição','Setor Hospitalar','Manchester','Protocolo','Exame',' TA Coleta ',' TA Triagem ',' TAT LAB ',' TAT '],
-        #usecols=[1, 3, 4, 5, 6, 7, 13, 17, 18],
-        #dtype={5: manchester_dtype, 6: protocolo_dtype},
-        encoding='latin1',
-        sep=';'
+        uploaded_file, header=2, usecols=[1, 3, 4, 5, 6, 7, 13, 17, 18],
+        dtype={5: manchester_dtype, 6: protocolo_dtype}
     )
-    data = data.rename(columns={' TA Coleta ': 'TA Coleta', ' TA Triagem ': 'TA Triagem', ' TAT LAB ': 'TAT LAB', ' TAT ': 'TAT'})
-    #st.dataframe(data)
-    
-    # Filtragens
-    ## Protocolos
+
+    # --- DataFrames filtrados ---
     sepse_df      = data[(data['Protocolo'].str.lower() == 'sepse')        & (data['Exame'] == 'LACTATO')]
     trp_df        = data[(data['Protocolo'].str.lower() == 'dor torácica') & (data['Exame'] == 'TRP')]
     avc_df        = data[(data['Protocolo'].str.lower() == 'janela avc')   & (data['Exame'] == 'TAP')]
-    ## Manchester
     emergencia_df = data[data['Manchester'].str.lower() == 'emergência']
     murgente_df   = data[data['Manchester'].str.lower() == 'muito urgente']
     urgente_df    = data[data['Manchester'].str.lower() == 'urgente']
     purgente_df   = data[data['Manchester'].str.lower() == 'pouco urgente']
 
-    # Data
-<<<<<<< HEAD
-    mes = pd.to_datetime(data['Data'].iloc[1], dayfirst=True).month
-    ano = pd.to_datetime(data['Data'].iloc[1], dayfirst=True).year
+    # --- Mês ---
+    mes = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).month
+    ano = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).year
     st.markdown(f':grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]', width="stretch")
-=======
-    #mes = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).month
-    #ano = pd.to_datetime(data['Data'].iloc[0], dayfirst=True).year
-    #st.markdown(f':grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]', width="stretch")
->>>>>>> a2290b5401fd71161271989be32982d58ba65209
 
-    # Tabs
+    # --- Tabs ---
     sepse_tab, card_tab, avc_tab, emergencia_tab, murgente_tab, urgente_tab, purgente_tab = st.tabs(
         ['SEPSE', 'DOR TORÁCICA', 'AVC', 'EMERGÊNCIA', 'MUITO URGENTE', 'URGENTE', 'POUCO URGENTE']
     )
 
-    # Montagem dos dashboards
-    ## Protocolos
+    # Protocolos simples — _grupos_protocolo devolve lista de 1 item
     mostrar_protocolo_tab(sepse_tab, sepse_df, 'sepse_df',  'Sepse',       _grupos_protocolo('sepse',        'LACTATO'))
     mostrar_protocolo_tab(card_tab,  trp_df,   'trp_df',    'Dor torácica', _grupos_protocolo('dor torácica', 'TRP'))
     mostrar_protocolo_tab(avc_tab,   avc_df,   'avc_df',    'Janela AVC',   _grupos_protocolo('janela avc',   'TAP'))
 
-    ## Manchester
+    # Manchester — _grupos_manchester devolve lista de 3 itens
     mostrar_protocolo_tab(emergencia_tab, emergencia_df, 'emergencia',  'Emergência',    _grupos_manchester('emergência'),    'Emergência')
     mostrar_protocolo_tab(murgente_tab,   murgente_df,   'murgente',    'Muito Urgente', _grupos_manchester('muito urgente'), 'Muito Urgente')
     mostrar_protocolo_tab(urgente_tab,    urgente_df,    'urgente',     'Urgente',       _grupos_manchester('urgente'),       'Urgente')

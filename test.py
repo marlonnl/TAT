@@ -27,6 +27,16 @@ MESES = {
     10: "Outubro", 11: "Novembro", 12: "Dezembro"
 }
 
+EXAMES = [
+   ['GASO', 'GASOV', 'HB', 'HT', 'PLA', 'NA', 'K', 'CAIO'],
+   ['H', 'TAP', 'KPTT', 'TRP', 'PCRQ', 'LACTATO', 'AMI'],
+   ['AUR', 'ALB', 'BIL', 'CA', 'CPK', 'CKMB', 'CL', 'FERRI', 'FAL', 'LDH', 'FOS', 'G', 'LIPASE', 'MAG', 'PTF', 'YGT', 'TGO', 'TGP', 'U', 'FIB', 'BHCG', 'EAS']
+]
+
+EXAMES1 = ['GASO', 'GASOV', 'HB', 'HT', 'PLA', 'NA', 'K', 'CAIO']
+EXAMES2 = ['H', 'TAP', 'KPTT', 'TRP', 'PCRQ', 'LACTATO', 'AMI']
+EXAMES3 = ['AUR', 'ALB', 'BIL', 'CA', 'CPK', 'CKMB', 'CL', 'FERRI', 'FAL', 'LDH', 'FOS', 'G', 'LIPASE', 'MAG', 'PTF', 'YGT', 'TGO', 'TGP', 'U', 'FIB', 'BHCG', 'EAS']
+
 METAS = {
   'sepse': [35],
   'dor torácica': [60],
@@ -38,13 +48,40 @@ METAS = {
   'não urgente': [80, 120, 150]
 }
 
-def mostrar_protocolo_tab(tab, df, session_key, protocolo, exame, meta):
+COR = {
+  #  red, orange, yellow, blue, green, violet, gray/grey
+  'sepse': 'orange',
+  'dor torácica': 'blue',
+  'janela avc': 'yellow',
+  'emergência': 'red',
+  'muito urgente': 'orange',
+  'urgente': 'yellow',
+  'pouco urgente': 'blue'
+}
+
+def criar_md(protocolo):
+  protocolo_ = protocolo.lower()
+
+  st.markdown(f'##### :{COR[protocolo_]}[:material/radio_button_checked:] *{protocolo}*')
+
+  metas_ = [str(pd.Timedelta(minutes=i)).split()[-1] for i in METAS[protocolo_]]
+
+  classificacao = pd.DataFrame(
+     {
+        "Meta de entrega": [metas_[0], metas_[1], metas_[2]],
+        "Exames": [', '.join(EXAMES[0]), ', '.join(EXAMES[1]), ', '.join(EXAMES[2])]
+     },
+  )
+  st.table(classificacao, border="horizontal")
+
+def mostrar_protocolo_tab(tab, df, session_key, protocolo, exame, meta, is_protocol=True):
     """
     Exibe uma aba de protocolo com métricas de tempo.
     """
 
     with tab:
-        st.markdown(f'##### Protocolo de *{protocolo}*: `{exame}`')
+        if is_protocol:
+          st.markdown(f'##### :{COR[protocolo.lower()]}[:material/radio_button_checked:] Protocolo de *{protocolo}*: `{exame}`')
 
         if session_key not in st.session_state:
             st.session_state[session_key] = df.copy()
@@ -67,16 +104,30 @@ def mostrar_protocolo_tab(tab, df, session_key, protocolo, exame, meta):
 
         st.session_state[session_key].update(edited_df)
 
+        if not is_protocol:
+          criar_md(protocolo)
+          st.bar_chart(edited_df[(pd.to_timedelta(edited_df['TAT LAB']) < meta)], x="Exame", y="TAT LAB", color="TAT LAB", stack=True)
+          # data[(data['Manchester'].str.lower() == 'emergência')]
+
         for col in ['TA Coleta', 'TAT LAB', 'TAT']:
           edited_df[col] = pd.to_timedelta(edited_df[col], errors="coerce")
 
         # Calcula métricas
         df_meta = edited_df[pd.to_timedelta(edited_df['TAT LAB']) < meta]
-        print(f'{protocolo}: dentro da meta {len(df_meta)} e total {len(edited_df)}')
-        rel_pct = round(len(df_meta) * 100 / len(edited_df), 2)
+        # print(f'{protocolo}: dentro da meta {len(df_meta)} e total {len(edited_df)}')
+
+        # rel_pct = round(len(df_meta) * 100 / len(edited_df), 2)
+        rel_pct = round(len(df_meta) * 100 / len(edited_df), 2) if len(df_meta) > 0 else 0
 
         def calc_metric(col):
+            if len(edited_df) == 0:
+              return "00:00:00", "00:00:00", ["down", "green"]
+
             t = pd.to_timedelta(edited_df[col]).mean()
+
+            if pd.isna(t):
+              return "00:00:00", "00:00:00", ["down", "green"]
+
             t_f = str(t.round('1s')).split()[-1]
             t_dif = str(abs(t - meta).round('1s')).split()[-1]
             t_arrow = ["up", "red"] if (t - meta) > pd.Timedelta(0) else ["down", "green"]
@@ -113,7 +164,7 @@ if uploaded_file is not None:
   sepse_df = data[(data['Protocolo'].str.lower() == 'sepse') & (data['Exame'] == 'LACTATO')]
   trp_df = data[(data['Protocolo'].str.lower() == 'dor torácica') & (data['Exame'] == 'TRP')]
   avc_df = data[(data['Protocolo'].str.lower() == 'janela avc') & (data['Exame'] == 'TAP')]
-  # emergencia_df = data[(data['Manchester'].str.lower() == 'emergência') & (data['Exame'] in 'TAP')]
+  emergencia_df = data[(data['Manchester'].str.lower() == 'emergência')]
 
   # Definição do mês
   calendario = data['Data'].iloc[0]
@@ -127,3 +178,5 @@ if uploaded_file is not None:
   mostrar_protocolo_tab(sepse_tab, sepse_df, 'sepse_df', 'Sepse', 'LACTATO', pd.Timedelta(minutes=35))
   mostrar_protocolo_tab(card_tab, trp_df, 'trp_df', 'Dor torácica', 'TRP', pd.Timedelta(minutes=60))
   mostrar_protocolo_tab(avc_tab, avc_df, 'avc_df', 'Janela AVC', 'TAP', pd.Timedelta(minutes=45))
+
+  mostrar_protocolo_tab(emergencia_tab, emergencia_df, 'emergencia', 'Emergência', 'H', pd.Timedelta(minutes=METAS['emergência'][0]), is_protocol=False)
