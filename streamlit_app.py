@@ -253,7 +253,7 @@ uploaded_file = st.file_uploader("Escolha o arquivo .CSV", type=["csv"], max_upl
 if uploaded_file is not None:
     data = pd.read_csv(
         uploaded_file, header=2,
-        usecols=['Data','Requisição','Setor Hospitalar','Manchester','Protocolo','Exame','TA Coleta','TA Triagem','TAT LAB','TAT'],
+        usecols=['Data','Requisição','Setor Hospitalar','Manchester','Protocolo','Exame',' TA Coleta ',' TA Triagem ',' TAT LAB ',' TAT '],
         #usecols=[1, 3, 4, 5, 6, 7, 13, 17, 18],
         #dtype={5: manchester_dtype, 6: protocolo_dtype},
         encoding='latin1',
