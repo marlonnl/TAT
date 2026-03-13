@@ -245,9 +245,26 @@ def mostrar_protocolo_tab(
 # App
 # ---------------------------------------------------------------------------
 
+
+# pg = st.navigation([
+#     st.Page("streamlit_app.py", title='Análise TAT', icon=':material/health_metrics:')
+# ])
+
+# home = st.sidebar.home
+
+# with st.sidebar:
+#     st.write('oi')
+#     st.page_link('streamlit_app.py', label='Análise TAT', icon=':material/health_metrics:')
+#     st.page_link('main.py', label='Main', icon=':material/health_metrics:')
+
+pg = st.navigation([
+    st.Page('streamlit_app.py', title='Análise TAT', icon=':material/health_metrics:'),
+    st.Page('alta.py', title='Pré-altas', icon=':material/outpatient:')
+], position='top')
+
+
 st.title("Análise TAT")
 
-#st.write(' oi')
 uploaded_file = st.file_uploader("Escolha o arquivo .CSV", type=["csv"], max_upload_size=400)
 
 if uploaded_file is not None:
@@ -280,6 +297,7 @@ if uploaded_file is not None:
 
     # Tabs
     sepse_tab, card_tab, avc_tab, emergencia_tab, murgente_tab, urgente_tab, purgente_tab = st.tabs(
+        # [f':material/microbiology: SEPSE', f':material/ecg_heart: DOR TORÁCICA', 'AVC', 'EMERGÊNCIA', 'MUITO URGENTE', 'URGENTE', 'POUCO URGENTE']
         ['SEPSE', 'DOR TORÁCICA', 'AVC', 'EMERGÊNCIA', 'MUITO URGENTE', 'URGENTE', 'POUCO URGENTE']
     )
 
