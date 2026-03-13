@@ -259,7 +259,7 @@ def mostrar_protocolo_tab(
 
 pg = st.navigation([
     st.Page('streamlit_app.py', title='Análise TAT', icon=':material/health_metrics:'),
-    st.Page('alta.py', title='Pré-altas', icon=':material/outpatient:')
+    # st.Page('alta.py', title='Pré-altas', icon=':material/outpatient:')
 ], position='top')
 
 
