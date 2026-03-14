@@ -2,6 +2,5 @@
 /venv
 *.xlsx
 *.csv
-*.txt
 /test
 /__pycache__
