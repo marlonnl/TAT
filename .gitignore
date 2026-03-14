@@ -4,3 +4,4 @@
 *.csv
 *.txt
 /test
+/__pychache__
