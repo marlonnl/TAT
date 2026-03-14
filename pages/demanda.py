@@ -11,3 +11,5 @@ df = get_dataframe()
 if df is not None:
     show_date_badge()
     st.write("...")
+else:
+    no_file()
