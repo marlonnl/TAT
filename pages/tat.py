@@ -1,7 +1,9 @@
+import streamlit as st
 import pandas as pd
 from pandas.api.types import CategoricalDtype
 
-import streamlit as st
+from utils import get_dataframe, no_file, show_date_badge
+
 
 manchester_dtype = CategoricalDtype(
     categories=["EMERGÊNCIA", "MUITO URGENTE", "URGENTE", "POUCO URGENTE"]
@@ -9,20 +11,6 @@ manchester_dtype = CategoricalDtype(
 
 protocolo_dtype = CategoricalDtype(categories=["SEPSE", "Janela AVC", "Dor Torácica"])
 
-MESES = {
-    1: "Janeiro",
-    2: "Fevereiro",
-    3: "Março",
-    4: "Abril",
-    5: "Maio",
-    6: "Junho",
-    7: "Julho",
-    8: "Agosto",
-    9: "Setembro",
-    10: "Outubro",
-    11: "Novembro",
-    12: "Dezembro",
-}
 
 EXAMES = [
     ["GASO", "GASOV", "HB", "HT", "PLA", "NA", "K", "CAIO"],
@@ -76,13 +64,13 @@ COR = {
 
 
 def _grupos_protocolo(protocolo: str, exame: str) -> list[dict]:
-    """Monta a lista de grupos para os protocolos (Sepse, AVC, DT)."""
+    """Monta a lista de grupos de exa,es para os protocolos (Sepse, AVC, DT)."""
     meta = pd.Timedelta(minutes=METAS[protocolo.lower()][0])
     return [{"exames": [exame], "meta": meta, "label": None}]
 
 
 def _grupos_manchester(protocolo: str) -> list[dict]:
-    """Monta a lista de grupos para as classificações Manchester."""
+    """Monta a lista de grupos de exames para as classificações Manchester."""
     return [
         {
             "exames": EXAMES[i],
@@ -310,69 +298,15 @@ def mostrar_protocolo_tab(
                 _bloco_metricas(edited_df.copy(), meta)
 
 
-# ---------------------------------------------------------------------------
-# App
-# ---------------------------------------------------------------------------
-
-
-# pg = st.navigation([
-#     st.Page("streamlit_app.py", title='Análise TAT', icon=':material/health_metrics:')
-# ])
-
-# home = st.sidebar.home
-
-# with st.sidebar:
-#     st.write('oi')
-#     st.page_link('streamlit_app.py', label='Análise TAT', icon=':material/health_metrics:')
-#     st.page_link('main.py', label='Main', icon=':material/health_metrics:')
-
-pg = st.navigation(
-    [
-        st.Page(
-            "streamlit_app.py", title="Análise TAT", icon=":material/health_metrics:"
-        ),
-        # st.Page('alta.py', title='Pré-altas', icon=':material/outpatient:')
-    ],
-    position="top",
-)
-
+# app
 
 st.title("Análise TAT")
 
-uploaded_file = st.file_uploader(
-    "Escolha o arquivo .CSV", type=["csv"], max_upload_size=400
-)
+data = get_dataframe()
 
-if uploaded_file is not None:
-    data = pd.read_csv(
-        uploaded_file,
-        header=2,
-        usecols=[
-            "Data",
-            "Requisição",
-            "Setor Hospitalar",
-            "Manchester",
-            "Protocolo",
-            "Exame",
-            " TA Coleta ",
-            " TA Triagem ",
-            " TAT LAB ",
-            " TAT ",
-        ],
-        # usecols=[1, 3, 4, 5, 6, 7, 13, 17, 18],
-        # dtype={5: manchester_dtype, 6: protocolo_dtype},
-        encoding="latin1",
-        sep=";",
-    )
-    data = data.rename(
-        columns={
-            " TA Coleta ": "TA Coleta",
-            " TA Triagem ": "TA Triagem",
-            " TAT LAB ": "TAT LAB",
-            " TAT ": "TAT",
-        }
-    )
-    # st.dataframe(data)
+if data is not None:
+    # if "dataset" in st.session_state and "df" in st.session_state["dataset"]:
+    # data = st.session_state["dataset"]["df"]
 
     # Filtragens
     ## Protocolos
@@ -391,13 +325,8 @@ if uploaded_file is not None:
     urgente_df = data[data["Manchester"].str.lower() == "urgente"]
     purgente_df = data[data["Manchester"].str.lower() == "pouco urgente"]
 
-    # Data
-    mes = pd.to_datetime(data["Data"].iloc[1], dayfirst=True).month
-    ano = pd.to_datetime(data["Data"].iloc[1], dayfirst=True).year
-    st.markdown(
-        f":grey-badge[:material/calendar_month: **{MESES[mes]}/{ano}**]",
-        width="stretch",
-    )
+    # Data (mês/ano)
+    show_date_badge()
 
     # Tabs
     (
@@ -470,3 +399,6 @@ if uploaded_file is not None:
         _grupos_manchester("pouco urgente"),
         "Pouco urgente",
     )
+
+else:
+    no_file()
