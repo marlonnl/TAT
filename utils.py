@@ -17,6 +17,8 @@ MESES = {
     12: "Dezembro",
 }
 
+DIA_SEMANA = {0: "S", 1: "T", 2: "Q", 3: "Q", 4: "S", 5: "S", 6: "D"}
+
 
 def get_dataset(arg: str) -> str | None:
     "Retorna o valor de um dado no state de acordo com a chave(arg)"
