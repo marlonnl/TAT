@@ -53,6 +53,7 @@ if uploaded_file is not None:
             "tat",
         ]
         df = df[_COLUMNS]
+        df["setor hospitalar"] = df["setor hospitalar"].str.strip()
 
         # renaming cols with extra space
         # df = df.rename(
