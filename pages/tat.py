@@ -101,10 +101,10 @@ def _criar_tabela_referencia(protocolo: str) -> None:
 def _bloco_metricas(edited_df: pd.DataFrame, meta: pd.Timedelta) -> None:
     """Renderiza os cards de métricas para um grupo de exames."""
 
-    for col in ["TA Coleta", "TAT LAB", "TAT"]:
+    for col in ["ta coleta", "tat lab", "tat"]:
         edited_df[col] = pd.to_timedelta(edited_df[col], errors="coerce")
 
-    df_meta = edited_df[edited_df["TAT LAB"] < meta]
+    df_meta = edited_df[edited_df["tat lab"] < meta]
     rel_pct = round(len(df_meta) * 100 / len(edited_df), 2) if len(edited_df) > 0 else 0
 
     def calc_metric(col):
@@ -120,9 +120,9 @@ def _bloco_metricas(edited_df: pd.DataFrame, meta: pd.Timedelta) -> None:
 
         return t_f, t_dif, t_arrow
 
-    tmc_f, tmc_dif, tmc_arrow = calc_metric("TA Coleta")
-    tml_f, tml_dif, tml_arrow = calc_metric("TAT LAB")
-    tat_f, tat_dif, tat_arrow = calc_metric("TAT")
+    tmc_f, tmc_dif, tmc_arrow = calc_metric("ta coleta")
+    tml_f, tml_dif, tml_arrow = calc_metric("tat lab")
+    tat_f, tat_dif, tat_arrow = calc_metric("tat")
 
     st.markdown(
         f":blue-badge[:material/alarm: Meta: {str(meta.round('1s')).split()[-1]}]"
@@ -242,20 +242,20 @@ def mostrar_protocolo_tab(
             if label:
                 st.caption(label)
 
-            df_grupo = df[df["Exame"].isin(exames)].copy()
+            df_grupo = df[df["exame"].isin(exames)].copy()
 
             metric_container = st.container()
 
             edited_df = st.data_editor(
-                df_grupo[["Requisição", "Exame", "TA Coleta", "TAT LAB", "TAT"]],
+                df_grupo[["requisição", "exame", "ta coleta", "tat lab", "tat"]],
                 width="stretch",
                 num_rows="dynamic",
                 column_config={
-                    "Requisição": st.column_config.NumberColumn("Requisição"),
-                    "Exame": st.column_config.TextColumn("Exame"),
-                    "TA Coleta": st.column_config.TextColumn("TA Coleta"),
-                    "TAT LAB": st.column_config.TextColumn("TAT LAB"),
-                    "TAT": st.column_config.TextColumn("TAT"),
+                    "Requisição": st.column_config.NumberColumn("requisição"),
+                    "Exame": st.column_config.TextColumn("exame"),
+                    "TA Coleta": st.column_config.TextColumn("ta coleta"),
+                    "TAT LAB": st.column_config.TextColumn("tat lab"),
+                    "TAT": st.column_config.TextColumn("tat"),
                 },
                 key=f"editor_{session_key}_{idx}",
             )
@@ -274,20 +274,20 @@ def mostrar_protocolo_tab(
             exames = grupo["exames"]
             meta = grupo["meta"]
 
-            df_grupo = df[df["Exame"].isin(exames)].copy()
+            df_grupo = df[df["exame"].isin(exames)].copy()
 
             metric_container = st.container()
 
             edited_df = st.data_editor(
-                df_grupo[["Requisição", "Exame", "TA Coleta", "TAT LAB", "TAT"]],
+                df_grupo[["requisição", "exame", "ta coleta", "tat lab", "tat"]],
                 width="stretch",
                 num_rows="dynamic",
                 column_config={
-                    "Requisição": st.column_config.NumberColumn("Requisição"),
-                    "Exame": st.column_config.TextColumn("Exame"),
-                    "TA Coleta": st.column_config.TextColumn("TA Coleta"),
-                    "TAT LAB": st.column_config.TextColumn("TAT LAB"),
-                    "TAT": st.column_config.TextColumn("TAT"),
+                    "Requisição": st.column_config.NumberColumn("requisição"),
+                    "Exame": st.column_config.TextColumn("exame"),
+                    "TA Coleta": st.column_config.TextColumn("ta coleta"),
+                    "TAT LAB": st.column_config.TextColumn("tat lab"),
+                    "TAT": st.column_config.TextColumn("tat"),
                 },
                 key=f"editor_{session_key}_{exames[0]}",
             )
@@ -311,19 +311,19 @@ if data is not None:
     # Filtragens
     ## Protocolos
     sepse_df = data[
-        (data["Protocolo"].str.lower() == "sepse") & (data["Exame"] == "LACTATO")
+        (data["protocolo"].str.lower() == "sepse") & (data["exame"] == "LACTATO")
     ]
     trp_df = data[
-        (data["Protocolo"].str.lower() == "dor torácica") & (data["Exame"] == "TRP")
+        (data["protocolo"].str.lower() == "dor torácica") & (data["exame"] == "TRP")
     ]
     avc_df = data[
-        (data["Protocolo"].str.lower() == "janela avc") & (data["Exame"] == "TAP")
+        (data["protocolo"].str.lower() == "janela avc") & (data["exame"] == "TAP")
     ]
     ## Manchester
-    emergencia_df = data[data["Manchester"].str.lower() == "emergência"]
-    murgente_df = data[data["Manchester"].str.lower() == "muito urgente"]
-    urgente_df = data[data["Manchester"].str.lower() == "urgente"]
-    purgente_df = data[data["Manchester"].str.lower() == "pouco urgente"]
+    emergencia_df = data[data["manchester"].str.lower() == "emergência"]
+    murgente_df = data[data["manchester"].str.lower() == "muito urgente"]
+    urgente_df = data[data["manchester"].str.lower() == "urgente"]
+    purgente_df = data[data["manchester"].str.lower() == "pouco urgente"]
 
     # Data (mês/ano)
     show_date_badge()
