@@ -18,35 +18,55 @@ if uploaded_file is not None:
         df = pd.read_csv(
             uploaded_file,
             header=2,
-            usecols=[
-                "Data",
-                "Requisição",
-                "Setor Hospitalar",
-                "Manchester",
-                "Protocolo",
-                "Exame",
-                " TA Coleta ",
-                " TA Triagem ",
-                " TAT LAB ",
-                " TAT ",
-            ],
+            # usecols=[
+            #     "Data",
+            #     "Requisição",
+            #     "Setor Hospitalar",
+            #     "Manchester",
+            #     "Protocolo",
+            #     "Exame",
+            #     " TA Coleta ",
+            #     " TA Triagem ",
+            #     " TAT LAB ",
+            #     " TAT ",
+            # ],
             encoding="latin1",
             sep=";",
         )
 
+        # trimming and selecting columns
+        df.columns = df.columns.str.strip()
+        df.columns = df.columns.str.lower()
+
+        # print(df)
+
+        _COLUMNS = [
+            "data",
+            "requisição",
+            "setor hospitalar",
+            "manchester",
+            "protocolo",
+            "exame",
+            "ta coleta",
+            "ta triagem",
+            "tat lab",
+            "tat",
+        ]
+        df = df[_COLUMNS]
+
         # renaming cols with extra space
-        df = df.rename(
-            columns={
-                " TA Coleta ": "TA Coleta",
-                " TA Triagem ": "TA Triagem",
-                " TAT LAB ": "TAT LAB",
-                " TAT ": "TAT",
-            }
-        )
+        # df = df.rename(
+        #     columns={
+        #         " TA Coleta ": "TA Coleta",
+        #         " TA Triagem ": "TA Triagem",
+        #         " TAT LAB ": "TAT LAB",
+        #         " TAT ": "TAT",
+        #     }
+        # )
 
         # time variables
-        month = pd.to_datetime(df["Data"].iloc[1], dayfirst=True).month
-        year = pd.to_datetime(df["Data"].iloc[1], dayfirst=True).year
+        month = pd.to_datetime(df["data"].iloc[1], dayfirst=True).month
+        year = pd.to_datetime(df["data"].iloc[1], dayfirst=True).year
 
         # storing dataframe into state
         st.session_state["dataset"] = {
