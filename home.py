@@ -30,6 +30,7 @@ if uploaded_file is not None:
             #     " TAT LAB ",
             #     " TAT ",
             # ],
+            # skip_blank_lines=True,
             encoding="latin1",
             sep=";",
         )
@@ -53,6 +54,12 @@ if uploaded_file is not None:
             "tat",
         ]
         df = df[_COLUMNS]
+
+        # typing date
+        df["data"] = df["data"].replace(["", " ", ","], pd.NA)
+        df["data"] = pd.to_datetime(df["data"], dayfirst=True).dt.normalize()
+
+        # trimming
         df["setor hospitalar"] = df["setor hospitalar"].str.strip()
 
         # renaming cols with extra space
