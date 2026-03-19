@@ -17,6 +17,33 @@ MESES = {
     12: "Dezembro",
 }
 
+DIA_SEMANA = {0: "S", 1: "T", 2: "Q", 3: "Q", 4: "S", 5: "S", 6: "D"}
+
+EXAMES_COLETA_TERCEIRIZADA = [
+    "BAAR",
+    "BAC," "CPSG",
+    "EAS",
+    "CTU",
+    "CRYP",
+    "CTFUN",
+    "CTFZ",
+    "LF",
+    "CTS",
+    "CTSG",
+    "CTSGA",
+    "CTSGAA",
+    "FUNCIO",
+    "FUNGOS",
+    "KPC",
+    "LIQR",
+    "LQA",
+    "LQP",
+    "PF",
+    "PSO",
+    "ROTLQ",
+    "RPC" "TSA",
+]
+
 
 def get_dataset(arg: str) -> str | None:
     "Retorna o valor de um dado no state de acordo com a chave(arg)"
